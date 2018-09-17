@@ -20,6 +20,10 @@ get '/' do
     slim :main
 end
 
+get '/links' do
+    slim :links
+end
+
 get '/about' do
     slim :about
 end
