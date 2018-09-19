@@ -4,6 +4,34 @@ html
     link    rel="stylesheet"    href="/material.min.css" type="text/css"
     link    rel="stylesheet"    href="/furday.css" type="text/css"
     script  src="/material.min.js"
+    javascript:
+      var onloadCallback = function() {
+        if (sessionStorage.getItem("lastname") == "Smith") {
+          show_agenda();
+        } else {
+          grecaptcha.render('html-element', {
+            'sitekey' : '#{@sitekey}',
+            'callback': success_captcha
+          });
+        }
+      };
+      function success_captcha() {
+        sessionStorage.setItem("lastname", "Smith");
+        show_agenda();
+      }
+      function show_agenda() {
+        if (sessionStorage.getItem("lastname") == "Smith") {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', '/agenda');
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              var div = document.getElementById("behind-captcha") ;
+              div.innerHTML = xhr.responseText;
+            } else { alert('Request failed.  Returned status of ' + xhr.status); }
+          };
+          xhr.send();
+        }
+      }
     meta    name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"
     title   Swiss Fluff Stuff
   body class="mdl-color--grey-100 mdl-color-text--grey-700 mdl-base"
@@ -13,10 +41,6 @@ html
         div class="page-content"
           section
             h3 Furry event calendar
-            p
-              a href="https://calendar.google.com/calendar/embed?src=vkcnn73uql185hrr93jnbfnmqg%40group.calendar.google.com&ctz=Europe%2FParis"
-                |Direct link to calendar
-              |&nbsp; | &nbsp;
-              a href="https://calendar.google.com/calendar/ical/vkcnn73uql185hrr93jnbfnmqg%40group.calendar.google.com/public/basic.ics"
-                |Export the Swiss Events as iCal
-            iframe src="https://calendar.google.com/calendar/embed?showTitle=0&showPrint=0&mode=AGENDA&height=600&wkst=1&bgcolor=%23FFFFFF&src=vkcnn73uql185hrr93jnbfnmqg%40group.calendar.google.com&color=%2323164E&src=nu74vbd0107bvl7l49b6q2gfuc%40group.calendar.google.com&color=%23B1365F&ctz=Europe%2FParis" style="border-width:0" width="800" height="600" frameborder="0" scrolling="no"
+            div id="behind-captcha"
+              div id="html-element"
+    script  src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer
